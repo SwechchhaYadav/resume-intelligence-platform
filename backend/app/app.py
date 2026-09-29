@@ -1,5 +1,5 @@
 import os
-from flask import Flask, app, jsonify
+from flask import Flask, jsonify
 from app.extensions import db, jwt, cors
 from app.config.config import config
 from app.routes.api_routes import (
@@ -22,9 +22,15 @@ def create_app(config_name='development'):
     jwt.init_app(app)
     
     # Initialize CORS
+    allowed_origins = [
+        origin.strip()
+        for origin in app.config.get("CORS_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
+
     cors.init_app(
         app,
-        resources={r"/api/*": {"origins": "http://localhost:4173"}},
+        resources={r"/api/*": {"origins": allowed_origins}},
         supports_credentials=True
     )
     
